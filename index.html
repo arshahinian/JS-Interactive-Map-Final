@@ -11,6 +11,22 @@
     <script src="./leaflet/leaflet.js"></script>
 </head>
 <body>
-    <div id="map" style="height: 600px;"></div>  
+    <div id="location">
+        <label id="userLocationLabel">*</label>
+        <br/>
+        <label id="latitudeLabel">Latitude: </label><label id="latitudeValue">0</label>
+        <label id="longitudeLabel">Longitude: </label><label id="longitudeValue">0</label>        
+    </div>
+    <div id="userInput">
+        <label for="businessTypes">Choose the type of business you are looking for:</label>
+        <select id="businessTypes" name="cars">
+            <option value="restaurants">Restaurants</option>
+            <option value="shops">Shops</option>
+            <option value="parking">Parking</option>
+            <option value="trainStation">Train Station</option>
+        </select>
+        <button id="findLocations" type="submit">Find</button>
+    </div>
+    <div id="map"></div>  
 </body>
 </html>
