@@ -1,5 +1,9 @@
 const myMap = L.map('map').fitWorld();
 
+const fourSquareClientId = 'HDG2IF0HLSCVRE3BW4DOWEZHTUJQVJ3NU0C0ZOX1QHRICBWZ';
+const fourSquareClientSecret = '0OFNB23STAFTGISFKJULTSQFA5HJJ1IK3LQ1IYJDA3J1IUUY';
+const fourSquareApiKey = 'fsq3OWQWtt35LdRkIlpq9RuKqhguYiI6kmkDGor2r5faYqs=';
+
 // location fetched successfully
 async function onCurrentPositionFound(position) {    
     let latitudeValueNumber = position.coords.latitude;
@@ -54,47 +58,48 @@ async function main()
         minZoom: '15',
     }).addTo(myMap);
 
-    document.getElementById("findLocations").addEventListener("click",() => {
+    document.getElementById("findLocations").addEventListener("click",async () => {
         let businessTypes = document.getElementById("businessTypes");
-        console.log( businessTypes.options[businessTypes.selectedIndex].value);
-    })
+        let businessSelected = businessTypes.options[businessTypes.selectedIndex].value;
+        console.log(businessSelected);
 
-    // // Create and add a geolocation marker:
-    // const marker = L.marker([48.87007, 2.346453])
-    // marker.addTo(myMap).bindPopup('<p1><b>The Hoxton, Paris</b></p1>').openPopup()
+        console.log('FETCH PLACE SEARCH')
 
-    // // Draw the 2nd Arrondissement
-    // var polygon = L.polygon([
-    //     [48.863368120198004, 2.3509079846928516],
-    //     [48.86933262048345, 2.3542531602919805],
-    //     [48.87199261164275, 2.3400569901592183],
-    //     [48.86993336274516, 2.3280142476578813], 
-    //     [48.86834104280146, 2.330308418109664]
-    // ]).addTo(myMap);
-
-
-    // // create red pin marker
-    // var myIcon = L.icon({
-    //     iconUrl: './assets/RedArrow.png',
-    //     iconSize: [40, 20],
-    //     iconAnchor: [40, 20],
-    //     popupAnchor: [-40, -20],
-    //     shadowUrl: './assets/BlueArrow.png',
-    //     shadowSize: [20, 20],
-    //     shadowAnchor: [20, 20]    
-    // });
-
-    // // Metro station markers:
-    // const rS = L.marker([48.866200610611926, 2.352236247419453],{icon: myIcon}).bindPopup('Réaumur-Sébastopol')
-    // const sSD = L.marker([48.869531786321566, 2.3528590208055196],{icon: myIcon}).bindPopup('Strasbourg-Saint-Denis')
-    // const sentier = L.marker([48.8673721067762, 2.347107922912739],{icon: myIcon}).bindPopup('Sentier')
-    // const bourse = L.marker([48.86868503971672, 2.3412285142058167],{icon: myIcon}).bindPopup('Bourse')
-    // const qS = L.marker([48.869560129483226, 2.3358638645569543],{icon: myIcon}).bindPopup('Quatre Septembre')
-    // const gB = L.marker([48.871282159004856, 2.3434818588892714],{icon: myIcon}).bindPopup('Grands Boulevards')
-
-    // const stations = L.layerGroup([rS, sSD, sentier, bourse, qS, gB]).addTo(myMap)
+        let latitudeValueText = document.getElementById("latitudeValue").innerText;    
+        let longitudeValueText = document.getElementById("longitudeValue").innerText;
+        
+        let options = {
+            method: 'GET',
+            headers: {
+              Accept: 'application/json',
+              Authorization: 'fsq3OWQWtt35LdRkIlpq9RuKqhguYiI6kmkDGor2r5faYqs='
+            }
+          };
 
 
+        let response = await fetch(`https://api.foursquare.com/v3/places/search?&query=${businessSelected}&limit=5&ll=${latitudeValueText},${longitudeValueText}`,options);
+        let jsonObj = await response.json();
+
+        let result = jsonObj.results;
+        
+        for(let r = 0;r < result.length;r++)
+        {
+            if(result[r] != undefined 
+                && result[r].geocodes != undefined 
+                && result[r].geocodes.main != undefined 
+                && result[r].name != undefined)
+            {
+                let latitude = result[r].geocodes.main.latitude;
+                let longitude = result[r].geocodes.main.longitude;
+                let name = result[r].name;
+
+                // // Create and add a geolocation marker:
+                let marker = L.marker([latitude, longitude]);
+                marker.addTo(myMap).bindPopup(`<p1><b>${name}</b></p1>`).openPopup();      
+                
+            }            
+        }        
+    });
 }
 
 main();
